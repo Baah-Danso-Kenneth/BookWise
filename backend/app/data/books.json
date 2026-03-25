@@ -1,0 +1,39 @@
+{
+  "books": [
+    {
+      "title": "The Richest Man in Babylon",
+      "author": "George S. Clason",
+      "categories": ["finance", "wealth", "parables", "personal-development"],
+      "description": "Classic parables about saving and building wealth through ancient Babylonian stories.",
+      "key_themes": ["saving", "investing", "financial discipline", "pay yourself first"]
+    },
+    {
+      "title": "Rich Dad Poor Dad",
+      "author": "Robert Kiyosaki",
+      "categories": ["finance", "wealth", "investing", "mindset"],
+      "description": "Contrasts two father figures to teach financial literacy and investing.",
+      "key_themes": ["assets vs liabilities", "financial independence", "investing"]
+    },
+    {
+      "title": "The Psychology of Money",
+      "author": "Morgan Housel",
+      "categories": ["finance", "behavioral-economics", "wealth", "psychology"],
+      "description": "Explores how people think about money and make financial decisions.",
+      "key_themes": ["behavior", "risk", "compounding", "enough"]
+    },
+    {
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "categories": ["self-help", "productivity", "psychology", "personal-development"],
+      "description": "Practical strategies for building good habits and breaking bad ones through small changes.",
+      "key_themes": ["habit formation", "identity change", "small improvements", "systems over goals"]
+    },
+    {
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "categories": ["history", "science", "anthropology", "philosophy"],
+      "description": "Explores the history of humanity from stone age to modern times.",
+      "key_themes": ["human evolution", "cognitive revolution", "agricultural revolution", "scientific revolution"]
+    }
+  ]
+}

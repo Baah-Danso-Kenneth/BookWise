@@ -11,7 +11,7 @@ class AgentService:
         with open(Path(__file__).parent.parent / "data" / "books.json") as f:
             books_data  = json.load(f)["books"]
 
-        self.executor = BookExecutor(books_data, config.COHERE_API_KEY)
+        self.executor = BookExecutor(books_data, config.COHERE_API_KEY, config.TAVILY_API_KEY)
     
     def recommend(self, query: str) -> dict:
         source_book = None

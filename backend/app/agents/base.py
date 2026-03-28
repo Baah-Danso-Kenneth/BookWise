@@ -13,11 +13,11 @@ class A2AAgent(ABC):
         )
 
     @abstractmethod
-    def process(self, task: Dict[str])-> Dict[str, Any]:
+    def process(self, task: Dict[str, Any])-> Dict[str, Any]:
         pass    
 
     def _invoke_llm(self, system: str, human: str) -> str:
-        response = self.llm(
+        response = self.llm.invoke(
             {"role": "system", "content": system},
             {"role": "user", "content": human}
         )

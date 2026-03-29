@@ -159,7 +159,7 @@ class BookExecutor:
     def _extract_author(self, content: str, title: str) -> str:
         """Extract author from Tavily content"""
         
-        # Pattern 1: "by Author Name"
+        # Pattern 1: "by AuthorbaseName"
         match = re.search(r'by\s+([A-Z][a-z]+\s+[A-Z][a-z]+)', content)
         if match:
             return match.group(1)

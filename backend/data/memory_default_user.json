@@ -1,0 +1,103 @@
+{
+  "user_id": "default_user",
+  "read_books": [],
+  "ratings": {},
+  "preferences": {
+    "liked_topics": [],
+    "disliked_topics": [],
+    "favorite_authors": [],
+    "last_query": "I read The Richest Man in Babylon"
+  },
+  "session_history": [
+    {
+      "timestamp": "2026-03-29T20:47:17.750436",
+      "query": "I read The Richest Man in Babylon",
+      "recommendations": [
+        "Books like The Richest Man in Babylon by George S. Clason",
+        "100 Books Like The Richest Man In Babylon - Shepherd.com",
+        "Books similar to 'The richest man in Babylon' : r/booksuggestions"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:47:22.644844",
+      "query": "I want a philosophy book",
+      "recommendations": [
+        "Philosophy Books - Five Books Expert Recommendations",
+        "Best Philosophy Books to Read Today | Barnes & Noble\u00ae",
+        "The best philosophical books you've ever read? : r/suggestmeabook"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:47:25.809772",
+      "query": "Something light and funny but educational",
+      "recommendations": [
+        "Educational books that are entertaining and story-like - Facebook",
+        "What is a funny, and somewhat, educational book to read? - Quora",
+        "Funny, witty, amusing books for light relief - seven circumstances"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:53:27.756569",
+      "query": "Something light and funny but educational",
+      "recommendations": [
+        "Stiff",
+        "Calvin And Hobbes",
+        "The Stinky Cheese Man and Other Fairly Stupid Tales"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:59:11.898254",
+      "query": "I read The Richest Man in Babylon",
+      "recommendations": [
+        "The Richest Man in Babylon",
+        "The Greatest Salesman in the World",
+        "Candide"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:59:15.567198",
+      "query": "I want a philosophy book",
+      "recommendations": [
+        "Sand Talk: How Indigenous Thinking Can Save the World",
+        "Way of the Peaceful Warrior: A Book That Changes Lives",
+        "Utopia"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T20:59:23.003606",
+      "query": "Something light and funny but educational",
+      "recommendations": [
+        "Stiff",
+        "The Great Glowing Coils of the Universe - Welcome to Night Vale, Episodes Volume 2",
+        "The Faceless Old Woman Who Secretly Lives in Your Home"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T21:07:10.995927",
+      "query": "I read The Richest Man in Babylon",
+      "recommendations": [
+        "The Millionaire Next Door: The Surprising Secrets of America's Wealthy",
+        "The Greatest Salesman in the World",
+        "Candide"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-29T21:13:19.417286",
+      "query": "I read The Richest Man in Babylon",
+      "recommendations": [
+        "The Choice",
+        "The Greatest Salesman in the World",
+        "Candide"
+      ],
+      "feedback": null
+    }
+  ]
+}

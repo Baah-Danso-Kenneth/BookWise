@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Any, List
 from datetime import datetime
@@ -12,7 +12,6 @@ class MCPToolStatus(Enum):
 
 @dataclass
 class MCPToolResult:
-
     """Standardized MCP tool result envelope"""
     tool_name: str
     status: MCPToolStatus
@@ -20,12 +19,11 @@ class MCPToolResult:
     metadata: Dict[str, Any] = None
     timestamp: str = None
 
-
-    def __post_init_(self):
-        self.timestamp = datetime.now().isoformat()
+    def __post_init__(self):          # ← was __post_init_ (missing underscore)
+        if self.timestamp is None:
+            self.timestamp = datetime.now().isoformat()
 
     def to_dict(self) -> Dict:
-        """ Convert result to dictionary for easier logging and processing """
         return {
             "tool_name": self.tool_name,
             "status": self.status.value,
@@ -37,7 +35,7 @@ class MCPToolResult:
 
 @dataclass
 class MCPToolDescriptor:
-    """Mcp tool registration descriptor"""
+    """MCP tool registration descriptor"""
     name: str
     description: str
     version: str
@@ -45,18 +43,17 @@ class MCPToolDescriptor:
 
 
 class MCPToolServer:
-    """Base class for all MCP-complaint tools"""
+    """Base class for all MCP-compliant tools"""
+
     def __init__(self):
         self.descriptor = self._register()
 
     def _register(self) -> MCPToolDescriptor:
         raise NotImplementedError
-    
+
     def execute(self, **kwargs) -> MCPToolResult:
         raise NotImplementedError
-    
+
     def __call__(self, **kwargs) -> Dict:
         result = self.execute(**kwargs)
         return result.to_dict()
-    
-    

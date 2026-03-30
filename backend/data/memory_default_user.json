@@ -6,7 +6,7 @@
     "liked_topics": [],
     "disliked_topics": [],
     "favorite_authors": [],
-    "last_query": "I read The Richest Man in Babylon"
+    "last_query": "I want a book which teaches of how to have good sex"
   },
   "session_history": [
     {
@@ -96,6 +96,76 @@
         "The Choice",
         "The Greatest Salesman in the World",
         "Candide"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:19:56.228273",
+      "query": "I read The Richest Man in Babylon",
+      "recommendations": [
+        "Rich Dad Poor Dad",
+        "The Psychology of Money",
+        "The Alchemist"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:20:27.041478",
+      "query": "I want a philosophy book",
+      "recommendations": [
+        "The Alchemist",
+        "Meditations",
+        "The Art of War"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:20:58.693837",
+      "query": "Something light and funny but educational",
+      "recommendations": [
+        "A Brief History of Time",
+        "The Hitchhiker's Guide to the Galaxy",
+        "Educated"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:24:51.604978",
+      "query": "I want a book which teaches of how to have good sex",
+      "recommendations": [
+        "Educated",
+        "Sapiens: A Brief History of Humankind",
+        "A Brief History of Time"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:40:29.044463",
+      "query": "I want a book which teaches of how to have good sex",
+      "recommendations": [
+        "Sex Education TV Review | Common Sense Media",
+        "What is Sex Education? | Sex Ed Definition and QA",
+        "Sex Education (TV series) - Wikipedia"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:56:25.496528",
+      "query": "I want a book which teaches of how to have good sex",
+      "recommendations": [
+        "The Ethical Slut: A Guide to Infinite Sexual Possibilities",
+        "The Story of Sex: A Graphic History Through the Ages",
+        "Come As You Are"
+      ],
+      "feedback": null
+    },
+    {
+      "timestamp": "2026-03-30T00:58:24.414783",
+      "query": "I want a book which teaches of how to have good sex",
+      "recommendations": [
+        "Come As You Are",
+        "The Story of Sex: A Graphic History Through the Ages",
+        "The Ethical Slut: A Guide to Infinite Sexual Possibilities"
       ],
       "feedback": null
     }

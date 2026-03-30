@@ -106,11 +106,12 @@ class BookSearchServer(MCPToolServer):
             "Each object must have:\n"
             '  "title"       — actual book title (not a webpage title)\n'
             '  "author"      — full author name found in the snippet, or "Unknown" if truly absent\n'
-            '  "description" — 2-3 sentences from the snippet describing what the book is about\n'
+            '  "description" — 2-3 sentences about ONLY this specific book, what it covers and why it is useful\n'
             '  "score"       — float 0.0-1.0 relevance to the query\n\n'
             "Rules:\n"
             "- NEVER use a webpage/site title as a book title\n"
             "- NEVER invent a description — only use text from the snippets\n"
+            "- The description must be about THIS book only — do NOT mention other books in it\n"
             "- Extract each book from numbered lists like '#1. Title by Author'\n"
             "- Skip entries with no real description found in the snippets\n"
             f"- Return at most {max_results} books\n"

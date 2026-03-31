@@ -1,35 +1,41 @@
 import logging
 from typing import Dict, Any
+
 from app.graph.state import AgentState
-from app.agents.planner import PlannerAgent
-from app.agents.executor import ExecutorAgent
-from app.agents.critic import CriticAgent
-from app.tools.guardrail import GuardrailServer
 from app.memory.episodic import EpisodicMemory
 
 
-# Agent instances — injected by AgentService via set_agents()
-planner   = None
-executor  = None
-critic    = None
-guardrail = None
+class AgentContainer:
+    """
+    Holds all agent and tool instances.
+    Passed into the graph at build time — no mutable module-level globals.
+    """
+    def __init__(self, planner, executor, critic, guardrail):
+        self.planner   = planner
+        self.executor  = executor
+        self.critic    = critic
+        self.guardrail = guardrail
 
 
-def set_agents(planner_agent, executor_agent, critic_agent):
-    global planner, executor, critic
-    planner  = planner_agent
-    executor = executor_agent
-    critic   = critic_agent
+# Single container instance — set once by AgentService at startup
+_container: AgentContainer = None
 
 
-def set_guardrail(guardrail_server):
-    global guardrail
-    guardrail = guardrail_server
+def init_container(planner, executor, critic, guardrail):
+    """Called once by AgentService to wire everything up"""
+    global _container
+    _container = AgentContainer(planner, executor, critic, guardrail)
+
+
+def get_container() -> AgentContainer:
+    if _container is None:
+        raise RuntimeError("AgentContainer not initialised — call init_container() first")
+    return _container
 
 
 # ── Node 1: Planner ──────────────────────────────────────────────────────────
 
-def planner_node(state: AgentState) -> Dict[str, Any]:
+async def planner_node(state: AgentState) -> Dict[str, Any]:
     logging.info(f"PlannerNode: processing query: {state['query']}")
 
     query   = state["query"]
@@ -39,14 +45,18 @@ def planner_node(state: AgentState) -> Dict[str, Any]:
     preferences = memory.get_preferences()
     read_books  = memory.get_read_books()
 
-    result = planner.process({"query": query, "preferences": preferences, "read_books": read_books})
-    plan   = result.get("plan", {})
+    result = get_container().planner.process({
+        "query":       query,
+        "preferences": preferences,
+        "read_books":  read_books
+    })
+    plan = result.get("plan", {})
 
-    # If book_based, the user already read that book — add it so executor filters it out
+    # If book_based, user already read the source — exclude it from results
     if plan.get("type") == "book_based":
-        source_title = plan.get("value", "")
-        if source_title and source_title not in read_books:
-            read_books = read_books + [source_title]
+        source = plan.get("value", "")
+        if source and source not in read_books:
+            read_books = read_books + [source]
 
     logging.info(f"PlannerNode: created {plan.get('type')} plan")
 
@@ -61,7 +71,7 @@ def planner_node(state: AgentState) -> Dict[str, Any]:
 
 # ── Node 2: Executor ─────────────────────────────────────────────────────────
 
-def executor_node(state: AgentState) -> Dict[str, Any]:
+async def executor_node(state: AgentState) -> Dict[str, Any]:
     logging.info(f"ExecutorNode: executing {state['plan_type']} plan")
 
     task = {
@@ -71,10 +81,10 @@ def executor_node(state: AgentState) -> Dict[str, Any]:
         "preferences": state.get("user_preferences", {})
     }
 
-    result          = executor.process_task(task)
+    result          = get_container().executor.process_task(task)
     recommendations = result.get("recommendations", [])
 
-    # Secondary filter — catch anything still matching read_books
+    # Secondary filter — belt-and-braces read_books check
     read_lower = [rb.lower() for rb in state.get("read_books", [])]
     filtered   = [r for r in recommendations if r.get("title", "").lower() not in read_lower]
 
@@ -91,7 +101,7 @@ def executor_node(state: AgentState) -> Dict[str, Any]:
 
 # ── Node 3: Critic ───────────────────────────────────────────────────────────
 
-def critic_node(state: AgentState) -> Dict[str, Any]:
+async def critic_node(state: AgentState) -> Dict[str, Any]:
     logging.info(f"CriticNode: evaluating {len(state.get('recommendations', []))} recommendations")
 
     task = {
@@ -100,7 +110,7 @@ def critic_node(state: AgentState) -> Dict[str, Any]:
         "attempt":         state.get("attempt_number", 1)
     }
 
-    result   = critic.process_task(task)
+    result   = get_container().critic.process_task(task)
     verdict  = result.get("verdict", "FAIL")
     score    = result.get("score", 0)
     feedback = result.get("feedback", "")
@@ -117,17 +127,16 @@ def critic_node(state: AgentState) -> Dict[str, Any]:
 
 # ── Node 4: Guardrail ────────────────────────────────────────────────────────
 
-def guardrail_node(state: AgentState) -> Dict[str, Any]:
+async def guardrail_node(state: AgentState) -> Dict[str, Any]:
     logging.info("GuardrailNode: scanning content")
 
     recommendations = state.get("recommendations", [])
-
     content = "\n".join([
         f"{r.get('title')} by {r.get('author')}: {r.get('description', '')}"
         for r in recommendations[:5]
     ])
 
-    result            = guardrail.execute(content)
+    result            = get_container().guardrail.execute(content)
     passed            = result.content.get("passed", False)
     sanitized_content = result.content.get("sanitized_content", content)
     disclaimer_added  = result.content.get("disclaimer_added", False)
@@ -153,9 +162,8 @@ def guardrail_node(state: AgentState) -> Dict[str, Any]:
 
 # ── Node 5: Output ───────────────────────────────────────────────────────────
 
-def output_node(state: AgentState) -> Dict[str, Any]:
+async def output_node(state: AgentState) -> Dict[str, Any]:
     logging.info("OutputNode: preparing final response")
-
     return {
         "final_recommendations": state.get("final_recommendations", []),
         "critic_score":          state.get("critic_score", 0),

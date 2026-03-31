@@ -1,9 +1,7 @@
-import json
 import logging
 from typing import Dict, Any, List, Union
 
 from app.agents.base import A2AAgent, A2AAgentCard, A2ATask, A2ATaskStatus
-from app.prompts import CRITIC_SYSTEM_PROMPT
 
 
 class CriticAgent(A2AAgent):
@@ -11,9 +9,9 @@ class CriticAgent(A2AAgent):
     Critic Agent - Evaluates recommendations and triggers self-correction.
 
     Scores on:
-    - Relevance  (40 pts) — do descriptions/titles relate to the query?
+    - Relevance  (40 pts) — do titles/descriptions actually relate to the query?
     - Diversity  (30 pts) — are titles unique?
-    - Quality    (30 pts) — are descriptions meaningful (>50 chars)?
+    - Quality    (30 pts) — are descriptions meaningful with known authors?
     """
 
     def __init__(self):
@@ -31,23 +29,20 @@ class CriticAgent(A2AAgent):
             skills=[{
                 "name": "evaluate_recommendations",
                 "description": "Score and evaluate recommendations",
-                "input": {"recommendations": "list", "query": "string"},
+                "input":  {"recommendations": "list", "query": "string"},
                 "output": {"score": "float", "verdict": "string", "feedback": "string"}
             }]
         )
 
     def process_task(self, task: Union[Dict[str, Any], A2ATask]) -> Union[Dict[str, Any], A2ATask]:
-        """Accepts plain dict (LangGraph nodes) or A2ATask (A2A protocol)"""
         if isinstance(task, dict):
             return self._evaluate_dict(task)
 
-        # A2ATask path
         task.update_status(A2ATaskStatus.WORKING)
         try:
             result = self._evaluate_dict(task.context)
             task.result = result
             task.update_status(A2ATaskStatus.COMPLETED)
-            logging.info(f"CriticAgent: verdict={result['verdict']}, score={result['score']}/100")
         except Exception as e:
             logging.error(f"CriticAgent failed: {e}")
             task.errors.append(str(e))
@@ -78,38 +73,24 @@ class CriticAgent(A2AAgent):
         if not recommendations:
             return {
                 "total_score": 0,
-                "feedback": "No recommendations found",
-                "scores": {"relevance": 0, "diversity": 0, "quality": 0},
-                "issues": ["empty_results"]
+                "feedback":    "No recommendations found",
+                "scores":      {"relevance": 0, "diversity": 0, "quality": 0},
+                "issues":      ["empty_results"]
             }
 
-        query_words = set(query.lower().split())
-
         # ── Relevance (40 pts) ───────────────────────────────────────────────
-        # Check how many books have titles/descriptions that overlap with query words
-        # OR have a non-trivial description (meaning the search found real content)
-        relevance_hits = 0
-        for r in recommendations:
-            title       = r.get("title", "").lower()
-            description = r.get("description", "").lower()
-            author      = r.get("author", "").lower()
-            combined    = f"{title} {description} {author}"
-
-            # Award relevance if description is substantial and not generic
-            if len(description) > 80:
-                relevance_hits += 1
-            elif any(w in combined for w in query_words if len(w) > 3):
-                relevance_hits += 1
-
-        relevance_score = min(40, int((relevance_hits / len(recommendations)) * 40))
+        # Use the similarity score from SemanticMemory/Tavily directly.
+        # This reflects actual semantic closeness to the query — not description length.
+        scores    = [r.get("score", 0) for r in recommendations]
+        avg_score = sum(scores) / len(scores)
+        relevance_score = min(40, int(avg_score * 40))
 
         # ── Diversity (30 pts) ───────────────────────────────────────────────
-        titles         = [r.get("title", "") for r in recommendations]
-        unique_ratio   = len(set(titles)) / len(recommendations)
+        titles          = [r.get("title", "") for r in recommendations]
+        unique_ratio    = len(set(titles)) / len(recommendations)
         diversity_score = min(30, int(unique_ratio * 30))
 
         # ── Quality (30 pts) ─────────────────────────────────────────────────
-        # Award 10 pts per book with a real description (>50 chars) and known author
         quality_score = 0
         for r in recommendations:
             desc   = r.get("description", "")
@@ -141,7 +122,7 @@ class CriticAgent(A2AAgent):
     def _determine_verdict(self, evaluation: Dict[str, Any], attempt: int) -> str:
         score = evaluation["total_score"]
         if attempt >= 3:
-            logging.info(f"Max attempts ({attempt}) reached, forcing PASS")
+            logging.info(f"Max attempts reached ({attempt}), forcing PASS")
             return "PASS"
         if score >= 70:
             return "PASS"
@@ -153,19 +134,19 @@ class CriticAgent(A2AAgent):
         parts = []
         if relevance < 25:
             parts.append(f"Relevance is low ({relevance}/40). Results don't match query well.")
-        elif relevance > 35:
+        elif relevance >= 35:
             parts.append(f"Good relevance ({relevance}/40).")
         if diversity < 20:
             parts.append(f"Lack of diversity ({diversity}/30).")
-        elif diversity > 25:
+        elif diversity >= 25:
             parts.append(f"Good diversity ({diversity}/30).")
         if quality < 20:
-            parts.append(f"Quality issues ({quality}/30). Some descriptions are incomplete.")
-        elif quality > 25:
+            parts.append(f"Quality issues ({quality}/30). Some descriptions incomplete.")
+        elif quality >= 25:
             parts.append(f"Good quality ({quality}/30).")
         if not parts:
             return f"Score: {relevance + diversity + quality}/100. Acceptable recommendations."
         return " ".join(parts)
 
     def get_critique_summary(self, result: Dict[str, Any]) -> str:
-        return f"[{result.get('verdict', 'unknown')}] Score: {result.get('score', 0)}/100 - {result.get('feedback', '')}"
+        return f"[{result.get('verdict')}] Score: {result.get('score')}/100 - {result.get('feedback')}"
